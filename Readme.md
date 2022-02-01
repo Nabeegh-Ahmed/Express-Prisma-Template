@@ -1,6 +1,6 @@
 # Express - Prisma Template (Typescript)
 
-An NodeJS Express server that uses Prisma ORM.
+A NodeJS Express server that uses Prisma ORM.
 
 # Stack
 
