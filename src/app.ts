@@ -1,40 +1,40 @@
 import express from 'express'
 import cors from 'cors'
-import { PrismaClient } from '@prisma/client'
+
 import dotenv from 'dotenv'
-dotenv.config()
+dotenv.config();
 
-const app = express()
-app.use(express.json())
-app.use(cors());
+import { User } from '@prisma/client';
 
-const prisma = new PrismaClient()
-
-const querySample = async() => {
-    const samples = await prisma.sample.findMany()
-    console.log(samples)
-}
-
-const createSample = async() => {
-    await prisma.sample.create({
-        data: {
-            name: 'sample1'
+declare global {
+    namespace Express {
+        export interface Request {
+            user: User | null
         }
+    }
+};
+
+const app: express.Application = express()
+app.use(express.json())
+app.use(cors({
+    origin: '*'
+}));
+
+import userRoutes from "./routes/userRoutes"
+import courseRoutes from './routes/courseRoutes'
+import requestRoutes from './routes/requestRoutes'
+import registrationRoutes from './routes/registrationRoutes'
+
+app.use('/api/user', userRoutes)
+app.use('/api/course', courseRoutes)
+app.use('/api/request', requestRoutes)
+app.use('/api/registration', registrationRoutes)
+
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`)
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(process.env.PORT, () => {
+        console.log(`Server is running on port ${process.env.PORT}`)
     })
-    const samples = await prisma.sample.findMany()
-    console.log(samples)
 }
 
-const updateSample = async() => {
-    const sample = await prisma.sample.update({
-        where: {id: 1},
-        data: {name: "SampleUpdated"}
-    })
-    console.log(sample)
-}
-
-createSample().catch(err => console.log(err)).finally(() => prisma.$disconnect())
-
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`)
-})
+export default app
